@@ -14,9 +14,9 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 public class MissileSiloPeripheral implements IPeripheral {
     protected final List<IComputerAccess> connected = new ArrayList<>();
     protected String type;
-    protected ElectricMotorBlockEntity tileEntity;
+    protected TileMissileSilo tileEntity;
 
-    public MissileSiloPeripheral(String type, ElectricMotorBlockEntity tileEntity) {
+    public MissileSiloPeripheral(String type, TileMissileSilo tileEntity) {
         this.type = type;
         this.tileEntity = tileEntity;
     }
@@ -51,50 +51,31 @@ public class MissileSiloPeripheral implements IPeripheral {
     }
 
     @LuaFunction(mainThread = true)
-    public final void setSpeed(int rpm) throws LuaException {
-        if (rpm == getSpeed())
-            return;
+    public final void setTarget(int x, int y, int z) throws LuaException {
         if (tileEntity != null) {
-            if (!tileEntity.setRPM(rpm))
-                throw new LuaException("Speed is set too many times per second (Anti Spam).");
+            Location tgt = new Location(x, y, z);
+            tileEntity.target = tgt;
         }
     }
 
     @LuaFunction(mainThread = true)
-    public final void stop() throws LuaException {
-        setSpeed(0);
-    }
+    public final String getTarget() throws LuaException {
 
-    @LuaFunction(mainThread = true)
-    public final int getSpeed() throws LuaException {
-        if (tileEntity != null)
-            return tileEntity.getRPM();
-        return 0;
-    }
-
-    @LuaFunction(mainThread = true)
-    public final int getStressCapacity() throws LuaException {
-        if (tileEntity != null)
-            return tileEntity.getGeneratedStress();
-        return 0;
-    }
-
-    @LuaFunction(mainThread = true)
-    public final int getEnergyConsumption() throws LuaException {
-        if (tileEntity != null)
-            return tileEntity.getEnergyConsumption();
-        return 0;
-    }
-
-    @LuaFunction(mainThread = true)
-    public final float rotate(int deg, Optional<Integer> rpm) throws LuaException {
         if (tileEntity != null) {
-            int _rpm = rpm.orElse(getSpeed());
-            if (rpm.isPresent())
-                setSpeed(deg < 0 ? -_rpm : _rpm);
-            return ElectricMotorBlockEntity.getDurationAngle(deg, 0, _rpm) / 20f;
+            int tgtX = tileEntity.target.intX;
+            int tgtY = tileEntity.target.intY;
+            int tgtZ = tileEntity.target.intZ;
+
+            return "" + tgtX + " " + tgtY + " " + tgtZ;
         }
-        return 0f;
+        return "Silo Not Found";
+    }
+
+    @LuaFunction(mainThread = true)
+    public final void launch() throws LuaException {
+        if (tileEntity != null) {
+            tileEntity.launch();
+        }
     }
 
     @LuaFunction(mainThread = true)
