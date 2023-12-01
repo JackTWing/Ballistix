@@ -55,6 +55,9 @@ public class MissileSiloPeripheral implements IPeripheral {
         if (tileEntity != null) {
             Location tgt = new Location(x, y, z);
             tileEntity.target = tgt;
+        } else {
+            // I hope this works!
+            throw new LuaException("Peripheral Not Connected")
         }
     }
 
@@ -75,17 +78,30 @@ public class MissileSiloPeripheral implements IPeripheral {
     public final void launch() throws LuaException {
         if (tileEntity != null) {
             tileEntity.launch();
+        } else {
+            // I hope this works!
+            throw new LuaException("Peripheral Not Connected")
         }
     }
 
     @LuaFunction(mainThread = true)
-    public final float translate(int blocks, Optional<Integer> rpm) throws LuaException {
+    public final void warheadAndMissileStatus() {
         if (tileEntity != null) {
-            int _rpm = rpm.orElse(getSpeed());
-            if (rpm.isPresent())
-                setSpeed(blocks < 0 ? -_rpm : _rpm);
-            return ElectricMotorBlockEntity.getDurationDistance(blocks, 0, _rpm) / 20f;
+            // Find if (a) it has a missile, and (b) if it has a warhead
+        } else {
+            // I hope this works!
+            throw new LuaException("Peripheral Not Connected")
         }
-        return 0f;
     }
+
+//    @LuaFunction(mainThread = true)
+//    public final float translate(int blocks, Optional<Integer> rpm) throws LuaException {
+//        if (tileEntity != null) {
+//            int _rpm = rpm.orElse(getSpeed());
+//            if (rpm.isPresent())
+//                setSpeed(blocks < 0 ? -_rpm : _rpm);
+//            return ElectricMotorBlockEntity.getDurationDistance(blocks, 0, _rpm) / 20f;
+//        }
+//        return 0f;
+//    }
 }
